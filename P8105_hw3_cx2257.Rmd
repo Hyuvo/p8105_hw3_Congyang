@@ -38,14 +38,50 @@ instacart %>%
   arrange(desc(n)) %>%
   mutate(aisle = factor(aisle, levels = aisle)) %>%
   ggplot(aes(x = aisle, y = n)) +
-  geom_segment(aes(xend = aisle, yend = 1), width = 15) +
+  geom_segment(aes(xend = aisle, yend = 1)) +
   geom_point(size = 4, color = "pink") +
   coord_flip() +
   theme_bw() +
   xlab("")
 ```
 
+4. **Make a table showing the three most popular items in each of the aisles "baking ingredients", "dog food care", and "packaged vegetables fruits". Include the number of times each item is ordered in your table.**
+
+```{r}
+freq_prod <- instacart %>%
+  filter(aisle == c(
+    "baking ingredients",
+    "dog food care",
+    "packaged vegetables fruits"
+  )) %>%
+  select(aisle, product_name) %>%
+  group_by(aisle) %>%
+  count(product_name, sort = TRUE) %>%
+  top_n(n = 3, wt = product_name) %>%
+  arrange(aisle, desc(n))
+
+freq_prod %>% knitr::kable() 
+```
+
+5. **Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).**
+
+```{r warning=FALSE}
+order_mean_hour_df <- 
+  instacart %>%
+  select(product_name, order_dow, order_hour_of_day) %>%
+  filter(product_name == c("Pink Lady Apples", "Coffee Ice Cream")) %>%
+  group_by(product_name, order_dow) %>%
+  mutate(order_mean_hour = mean(order_hour_of_day)) %>%
+  arrange(product_name, order_dow) %>%
+  select(-order_hour_of_day) %>%
+  distinct() %>%
+  pivot_wider(names_from = order_dow, values_from = order_mean_hour)
+  
+
+names(order_mean_hour_df)[2:8] <- c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
+order_mean_hour_df %>% knitr::kable(caption = "The mean hour of items ordered each weekday")
 
 
+```
  
 
