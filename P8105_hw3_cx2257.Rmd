@@ -31,14 +31,14 @@ instacart %>%
  
 3. **Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.**
   
-```{r}
+```{r fig.height=8, fig.width=8}
 instacart %>%
   count(aisle) %>%
   filter(n > 10000) %>%
   arrange(desc(n)) %>%
   mutate(aisle = factor(aisle, levels = aisle)) %>%
   ggplot(aes(x = aisle, y = n)) +
-  geom_segment(aes(xend = aisle, yend = 1)) +
+  geom_segment(aes(xend = aisle, yend = 1), color = "#B1B479") +
   geom_point(size = 4, color = "pink") +
   coord_flip() +
   theme_bw() +
@@ -142,7 +142,7 @@ excellent_df <-
   group_by(locationabbr, year) %>%
   summarise(avg_data_value = mean(data_value, na.rm = TRUE)) 
 ```
-```{r}
+```{r fig.height=5, fig.width=10}
 excellent_df %>%
   ggplot(aes(x = year, y = avg_data_value)) +
   geom_line(aes(group = locationabbr, color = locationabbr)) +
@@ -152,7 +152,7 @@ excellent_df %>%
 
 3. Make a two-panel plot showing, for the years 2006, and 2010, distribution of data_value for responses (“Poor” to “Excellent”) among locations in NY State.
 
-```{r}
+```{r echo=TRUE, fig.height=8, fig.width=8, message=FALSE, warning=FALSE, paged.print=FALSE}
 data_value_06 <-
   brfss_df %>%
   filter(year == 2006, 
@@ -161,6 +161,7 @@ data_value_06 <-
   ggplot(aes(x = locationdesc, y = data_value, fill = response)) +
   geom_bar(position = "dodge", stat = "identity") +
   viridis::scale_fill_viridis(discrete = TRUE) +
+  ggtitle("data_value distribution in 2006") +
   theme_bw()
 
 data_value_10 <-
@@ -171,6 +172,7 @@ data_value_10 <-
   ggplot(aes(x = locationdesc, y = data_value, fill = response)) +
   geom_bar(position = "dodge", stat = "identity") +
   viridis::scale_fill_viridis(discrete = TRUE) +
+  ggtitle("data_value distribution in 2010") +
   theme_bw()
 
 data_value_06 / data_value_10
@@ -178,3 +180,36 @@ data_value_06 / data_value_10
 
 ```
 
+## Problem 3
+
+1. Load, tidy, and otherwise wrangle the data. Your final dataset should include all originally observed variables and values; have useful variable names; include a weekday vs weekend variable; and encode data with reasonable variable classes. Describe the resulting dataset (e.g. what variables exist, how many observations, etc).
+
+```{r message=FALSE, warning=FALSE}
+accel_data_df <- read_csv("accel_data.csv") %>%
+  janitor::clean_names() %>%
+  pivot_longer(
+    activity_1:activity_1440,
+    names_to = "activity",
+    names_prefix = "activity_",
+    values_to = "activity_counts"
+  ) %>%
+  mutate(
+    weekday_or_weekend = if_else(day %in% c("Saturday", "Sunday"), "Weekend", "Weekday")
+  ) 
+```
+**Description of the dataset**: The instacart dataset contains `r nrow(accel_data_df)` observations and `r ncol(accel_data_df)` variables. The varibales are `r names(accel_data_df)`.
+
+2. Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate accross minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?
+
+```{r}
+accel_data_df %>%
+  mutate(day = forcats::fct_relevel(day, c("Monday", "Tuesday", "Wednesday", 
+                              "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  group_by(week, day) %>%
+  summarise(total_counts = sum(activity_counts)) %>%
+  pivot_wider(names_from = week, values_from = total_counts, names_prefix = "week_") %>% 
+  knitr::kable(digits = 2)
+```
+
+
+3. Accelerometer data allows the inspection activity over the course of the day. Make a single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week. Describe in words any patterns or conclusions you can make based on this graph.
