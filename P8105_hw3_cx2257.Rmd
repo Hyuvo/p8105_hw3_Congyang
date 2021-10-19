@@ -153,13 +153,14 @@ excellent_df %>%
 
 3. Make a two-panel plot showing, for the years 2006, and 2010, distribution of data_value for responses (“Poor” to “Excellent”) among locations in NY State.
 
-```{r echo=TRUE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE, paged.print=FALSE}
+```{r echo=TRUE, fig.height=9, fig.width=10, message=FALSE, warning=FALSE, paged.print=FALSE}
 data_value_06 <-
   brfss_df %>%
   filter(year == 2006, 
          locationabbr == "NY") %>%
-  ggplot(aes(x = locationdesc, y = data_value, fill = response)) +
-  geom_bar(position = "dodge", stat = "identity") +
+  ggplot(aes(x = data_value, y = response, fill = response)) +
+  ggridges::geom_density_ridges(alpha = 0.6) +
+  ggridges::theme_ridges() + 
   viridis::scale_fill_viridis(discrete = TRUE) +
   ggtitle("data_value distribution in 2006") +
   theme_bw()
@@ -168,8 +169,9 @@ data_value_10 <-
   brfss_df %>%
   filter(year == 2010, 
          locationabbr == "NY") %>%
-  ggplot(aes(x = locationdesc, y = data_value, fill = response)) +
-  geom_bar(position = "dodge", stat = "identity") +
+  ggplot(aes(x = data_value, y = response, fill = response)) +
+  ggridges::geom_density_ridges(alpha = 0.6) +
+  ggridges::theme_ridges() + 
   viridis::scale_fill_viridis(discrete = TRUE) +
   ggtitle("data_value distribution in 2010") +
   theme_bw()
