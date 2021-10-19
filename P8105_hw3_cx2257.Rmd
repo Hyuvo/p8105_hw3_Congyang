@@ -13,7 +13,7 @@ library(patchwork)
 
 ```{r}
 library(p8105.datasets)
-force(data("instacart"))
+data("instacart")
 ```
 1. **Description of the dataset**: The instacart dataset contains `r nrow(instacart)` observations and `r ncol(instacart)` variables. The varibales are `r names(instacart)`. The dataset inclueds `r length(unique(pull(instacart, product_name)))` different products, which belongs to `r length(unique(pull(instacart, aisle)))` aisles in `r length(unique(pull(instacart, department)))` departments. The dataset records how products get added into different shopping carts by different users and the products' information as well. For example, `r pull(instacart, product_name)[1]` was added to the order `r pull(instacart, order_id)[1]` by customer whose user id is `r pull(instacart, user_id)[1]` at `r pull(instacart, order_hour_of_day)[1]` o'clock, which is the `r pull(instacart, add_to_cart_order)[1]`st product added to the cart.
 
@@ -31,7 +31,7 @@ instacart %>%
  
 3. **Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.**
   
-```{r fig.height=6, fig.width=8}
+```{r fig.height=6, fig.width=12}
 instacart %>%
   count(aisle) %>%
   filter(n > 10000) %>%
@@ -40,6 +40,7 @@ instacart %>%
   ggplot(aes(x = aisle, y = n)) +
   geom_segment(aes(xend = aisle, yend = 1), color = "#B1B479") +
   geom_point(size = 4, color = "pink") +
+  geom_text(aes(label = n), color = "#B1B479", hjust = -0.25, size = 3) +
   coord_flip() +
   theme_bw() +
   xlab("")
@@ -49,20 +50,18 @@ instacart %>%
 
 ```{r}
 freq_prod <- instacart %>%
-  filter(aisle == c(
+  filter(aisle %in% c(
     "baking ingredients",
     "dog food care",
     "packaged vegetables fruits"
   )) %>%
-  # select(aisle, product_name) %>%
   group_by(aisle, product_name) %>%
   summarise(n = n()) %>% 
-  # count(product_name, sort = TRUE) %>%
-  top_n(n = 3, wt = n) %>%
-  arrange(aisle, desc(n))
+  top_n(n = 3, wt = n)
 
 freq_prod %>% knitr::kable() 
 ```
+
 
 5. **Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).**
 
@@ -70,7 +69,7 @@ freq_prod %>% knitr::kable()
 order_mean_hour_df <- 
   instacart %>%
   select(product_name, order_dow, order_hour_of_day) %>%
-  filter(product_name == c("Pink Lady Apples", "Coffee Ice Cream")) %>%
+  filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) %>%
   group_by(product_name, order_dow) %>%
   mutate(order_mean_hour = mean(order_hour_of_day)) %>%
   arrange(product_name, order_dow) %>%
@@ -148,6 +147,7 @@ excellent_df %>%
   ggplot(aes(x = year, y = avg_data_value)) +
   geom_line(aes(group = locationabbr, color = locationabbr)) +
   viridis::scale_color_viridis(discrete = T) +
+  ggtitle("average data value change over time within each state") +
   theme_bw()
 ```
 
