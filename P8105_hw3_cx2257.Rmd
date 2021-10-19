@@ -153,7 +153,7 @@ excellent_df %>%
 
 3. Make a two-panel plot showing, for the years 2006, and 2010, distribution of data_value for responses (“Poor” to “Excellent”) among locations in NY State.
 
-```{r echo=TRUE, fig.height=9, fig.width=10, message=FALSE, warning=FALSE, paged.print=FALSE}
+```{r echo=TRUE, fig.height=7, fig.width=10, message=FALSE, warning=FALSE, paged.print=FALSE}
 data_value_06 <-
   brfss_df %>%
   filter(year == 2006, 
