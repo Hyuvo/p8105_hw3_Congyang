@@ -31,7 +31,7 @@ instacart %>%
  
 3. **Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.**
   
-```{r fig.height=8, fig.width=8}
+```{r fig.height=6, fig.width=8}
 instacart %>%
   count(aisle) %>%
   filter(n > 10000) %>%
@@ -152,7 +152,7 @@ excellent_df %>%
 
 3. Make a two-panel plot showing, for the years 2006, and 2010, distribution of data_value for responses (“Poor” to “Excellent”) among locations in NY State.
 
-```{r echo=TRUE, fig.height=8, fig.width=8, message=FALSE, warning=FALSE, paged.print=FALSE}
+```{r echo=TRUE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE, paged.print=FALSE}
 data_value_06 <-
   brfss_df %>%
   filter(year == 2006, 
@@ -189,12 +189,14 @@ accel_data_df <- read_csv("accel_data.csv") %>%
   janitor::clean_names() %>%
   pivot_longer(
     activity_1:activity_1440,
-    names_to = "activity",
+    names_to = "act_minute",
     names_prefix = "activity_",
     values_to = "activity_counts"
   ) %>%
   mutate(
-    weekday_or_weekend = if_else(day %in% c("Saturday", "Sunday"), "Weekend", "Weekday")
+    weekday_or_weekend = if_else(day %in% c("Saturday", "Sunday"), "Weekend", "Weekday"),
+    day = forcats::fct_relevel(day, c("Monday", "Tuesday", "Wednesday", 
+                              "Thursday", "Friday", "Saturday", "Sunday"))
   ) 
 ```
 **Description of the dataset**: The instacart dataset contains `r nrow(accel_data_df)` observations and `r ncol(accel_data_df)` variables. The varibales are `r names(accel_data_df)`.
@@ -202,14 +204,30 @@ accel_data_df <- read_csv("accel_data.csv") %>%
 2. Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate accross minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?
 
 ```{r}
+minute_activity_df <-
 accel_data_df %>%
-  mutate(day = forcats::fct_relevel(day, c("Monday", "Tuesday", "Wednesday", 
-                              "Thursday", "Friday", "Saturday", "Sunday"))) %>%
   group_by(week, day) %>%
   summarise(total_counts = sum(activity_counts)) %>%
-  pivot_wider(names_from = week, values_from = total_counts, names_prefix = "week_") %>% 
-  knitr::kable(digits = 2)
-```
+  pivot_wider(names_from = week, values_from = total_counts, names_prefix = "week_")
 
+knitr::kable(minute_activity_df, digits = 2)
+```
+There is no apparent trend here. It seems that the patient took some rest on the saturday of week4 and week5.
 
 3. Accelerometer data allows the inspection activity over the course of the day. Make a single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week. Describe in words any patterns or conclusions you can make based on this graph.
+
+```{r fig.height=6, fig.width=10}
+hour_activity_df <-
+accel_data_df %>% 
+  mutate(act_hour = floor((as.numeric(act_minute)-1)/60)) %>%
+  group_by(day, act_hour) %>%
+  summarise(hour_sum = sum(activity_counts))
+
+hour_activity_df %>% 
+  ggplot(aes(x = act_hour, y = hour_sum)) +
+  geom_line(aes(group = day, color = day)) +
+  viridis::scale_fill_viridis(discrete = TRUE) +
+  ggtitle("24-hr activity sum for each day") +
+  theme_bw()
+```
+The patient has 2 peak activity periods at a day, one is around 11, 12 o'clock at noon, another is around 8 o'clock at night. The patient's activity sharply went down after going to sleep and stayed at a very low level until waking up in the morning.
