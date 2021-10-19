@@ -54,10 +54,11 @@ freq_prod <- instacart %>%
     "dog food care",
     "packaged vegetables fruits"
   )) %>%
-  select(aisle, product_name) %>%
-  group_by(aisle) %>%
-  count(product_name, sort = TRUE) %>%
-  top_n(n = 3, wt = product_name) %>%
+  # select(aisle, product_name) %>%
+  group_by(aisle, product_name) %>%
+  summarise(n = n()) %>% 
+  # count(product_name, sort = TRUE) %>%
+  top_n(n = 3, wt = n) %>%
   arrange(aisle, desc(n))
 
 freq_prod %>% knitr::kable() 
@@ -156,7 +157,6 @@ excellent_df %>%
 data_value_06 <-
   brfss_df %>%
   filter(year == 2006, 
-         response == "Poor" | response == "Excellent",
          locationabbr == "NY") %>%
   ggplot(aes(x = locationdesc, y = data_value, fill = response)) +
   geom_bar(position = "dodge", stat = "identity") +
@@ -167,7 +167,6 @@ data_value_06 <-
 data_value_10 <-
   brfss_df %>%
   filter(year == 2010, 
-         response == "Poor" | response == "Excellent",
          locationabbr == "NY") %>%
   ggplot(aes(x = locationdesc, y = data_value, fill = response)) +
   geom_bar(position = "dodge", stat = "identity") +
