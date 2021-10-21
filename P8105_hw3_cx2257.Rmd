@@ -28,6 +28,7 @@ instacart %>%
   head(3) %>%
   knitr::kable()
 ```
+ We can tell by the table that the most popular categories in the store is fresh fruits and vegetables.
  
 3. **Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.**
   
@@ -46,6 +47,8 @@ instacart %>%
   xlab("")
 ```
 
+The aisles are ordered by number of items ordered in corresponding aisle.
+
 4. **Make a table showing the three most popular items in each of the aisles "baking ingredients", "dog food care", and "packaged vegetables fruits". Include the number of times each item is ordered in your table.**
 
 ```{r}
@@ -61,7 +64,7 @@ freq_prod <- instacart %>%
 
 freq_prod %>% knitr::kable() 
 ```
-
+The most popular products in baking ingredients are sugar and soda. The dog food care aisle is relatively less popular than the other 2 categories. The most popular products in packaged vegetables and fruits are all organic food.
 
 5. **Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).**
 
@@ -83,6 +86,7 @@ order_mean_hour_df %>% knitr::kable(caption = "The mean hour of items ordered ea
 
 
 ```
+It seems that customers tend to order coffee ice cream in the afternoon, probably people usually feel sleepy at that time and need to be refreshed. The pink lady apple is more likely to be ordered at noon, probably people want to have some fruit after lunch.
  
 ## Problem 2
 
@@ -101,7 +105,7 @@ brfss_df <-
   filter(topic == "Overall Health") %>%
   mutate(response = factor(
     response,
-    levels = c("Poor", "Fair", "Good", "Very good", "Excellent")
+    levels = c("Poor", "Fair", "Good", "Very good", "Excellent") # response order from poor to excellent
   ))
 
 ```
@@ -133,6 +137,8 @@ brfss_df %>%
   knitr::kable(caption = "states that were obeserved at least 7 locations in 2010")
 ```
 
+The 2002 data are mostly observed in eastern states comparing with the 2010 data.
+
 2. Construct a dataset that is limited to Excellent responses, and contains, year, state, and a variable that averages the data_value across locations within a state. Make a “spaghetti” plot of this average value over time within a state (that is, make a plot showing a line for each state across years – the geom_line geometry and group aesthetic will help).
 
 ```{r}
@@ -150,6 +156,7 @@ excellent_df %>%
   ggtitle("average data value change over time within each state") +
   theme_bw()
 ```
+As filtered by excellent response, the data values are mostly distributed above 20, but the values still fluctuates from time to time and states to states.
 
 3. Make a two-panel plot showing, for the years 2006, and 2010, distribution of data_value for responses (“Poor” to “Excellent”) among locations in NY State.
 
@@ -180,6 +187,7 @@ data_value_06 / data_value_10
 
 
 ```
+We can tell by the comparison of the 2 panels that the distributions of data value between the same-level responses are generally the same.
 
 ## Problem 3
 
